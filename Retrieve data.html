@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Form</title>
+</head>
+<body>
+    <h2>Login Form</h2>
+    <form id="loginForm">
+        <label for="loginName">Name:</label><br>
+        <input type="text" id="loginName" name="name"><br>
+        <label for="loginPassword">Password:</label><br>
+        <input type="password" id="loginPassword" name="password"><br>
+        <button type="submit">Login</button>
+    </form>
+
+    <script type="module">
+        // Import the Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Firebase configuration (use your own configuration)
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            databaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID",
+            measurementId: "YOUR_MEASUREMENT_ID"
+        };
+
+        // Initialize Firebase app
+        const app = initializeApp(firebaseConfig);
+
+        // Get a reference to the Firebase database
+        const database = getDatabase(app);
+
+        // Reference to the 'Users' node in the database
+        const usersRef = ref(database, 'users');
+
+        // Login form submission
+        const loginForm = document.getElementById('loginForm');
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const loginName = document.getElementById('loginName').value.trim();
+            const loginPassword = document.getElementById('loginPassword').value.trim();
+
+            // Retrieve data from the 'Users' node in the database
+            onValue(usersRef, (snapshot) => {
+                const users = snapshot.val();
+                if (users) {
+                    const foundUser = Object.values(users).find(user => user.Name === loginName && user.Password === loginPassword);
+                    if (foundUser) {
+                        alert('Login successful!');
+                        console.log(foundUser);
+                        // Redirect or perform other actions upon successful login
+                    } else {
+                        alert('Invalid username or password. Please try again.');
+                    }
+                } else {
+                    alert('No users found. Please sign up first.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
